@@ -20,13 +20,13 @@ st.title("📝 File Q&A with OpenAI")
 uploaded_files = st.file_uploader("Upload a document", type=("txt", "pdf"), accept_multiple_files=True)
 
 question = st.chat_input(
-    "Ask something about the document",
+    "Ask something about the documents",
     disabled=not uploaded_files,
 )
 
 # Keep track of conversation state
 if "messages" not in st.session_state:
-    st.session_state["messages"] = [{"role": "assistant", "content": "Ask something about the article"}]
+    st.session_state["messages"] = [{"role": "assistant", "content": "Ask something about the documents you uploaded!"}]
 
 # Maintain a list of already processed documents to avoid duplication
 if "existing_docs" not in st.session_state:
@@ -37,7 +37,8 @@ if "vectorstore" not in st.session_state:
     st.session_state["vectorstore"] = None
 
 for msg in st.session_state.messages:
-    st.chat_message(msg["role"]).write(msg["content"])
+    # Use Markdown and convert newlines to Markdown line breaks so multi-line content renders as intended
+    st.chat_message(msg["role"]).markdown(msg["content"].replace("\n", "  \n"))
 
 if question and uploaded_files:
     # Process each uploaded file
@@ -66,10 +67,17 @@ if question and uploaded_files:
         # Load the documents
         documents = loader.load()
 
+        # Rename the source to the uploaded file name for better traceability
+        renamed_docs = []
+        for doc in documents:
+            doc.metadata["source"] = uploaded_file.name
+            renamed_docs.append(doc)
+        documents = renamed_docs
+
         # Chunk the documents
         text_splitter = RecursiveCharacterTextSplitter(
-            chunk_size = 200,
-            chunk_overlap = 0
+            chunk_size = 300,
+            chunk_overlap = 20
         )
         chunks = text_splitter.split_documents(documents)
 
@@ -89,7 +97,7 @@ if question and uploaded_files:
             st.session_state.vectorstore.add_documents(chunks)
 
     def format_docs(docs):
-        return "\n\n---\n\n".join(d.page_content for d in docs)
+        return "\n\n---\n\n".join(f"{d.page_content} [source: {d.metadata['source']}] " for d in docs)
 
     docs = st.session_state.vectorstore.similarity_search(question, k=5)
 
@@ -97,6 +105,7 @@ if question and uploaded_files:
     system_instructions = (
         "You are a helpful assistant for question answering.\n"
         "Use ONLY the provided context to answer concisely (<=3 sentences).\n"
+        "Cite sources for statements you derive from the context: [source_file_name].\n"
         "If the answer isn't in the context, say you don't know.\n\n"
         f"Context:\n{context}"
     )
@@ -123,7 +132,7 @@ if question and uploaded_files:
             tokens = len(enc.encode(message["content"]))
             total_tokens += tokens
         total_tokens += len(enc.encode(system_instructions))
-        print(f"Total tokens in query: {total_tokens}")
+        print(f"Total tokens in query: {total_tokens}")      
 
     # Append the assistant's response to the messages
     st.session_state.messages.append({"role": "assistant", "content": response})

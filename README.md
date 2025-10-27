@@ -127,13 +127,15 @@ As stated before, documents are only handled once. Thus, we need to have a way t
 When a document is deleted, we do not remove its information from the vector store. If a user wants the model to forget this information, they must start a new chat. This decision was made because the document will have been used in previous parts of the chat, so it will already have context in the chat. Additionally, due to the nature of RAG, it is unnecessary to remove old document information because the user's new queries can be related specifically to the new document.
 
 #### Chunking
-I chose a chunk size of 200 and overlap of 0. In all the trials I ran with different documents, this appeared to get the best results for efficiency and correctness for model responses.
+I chose a chunk size of 300 and overlap of 20. In all the trials I ran with different documents, this appeared to get the best results for efficiency and correctness for model responses. Additionally, it seemed to make sources better.
 
 ### RAG pipeline
 I queried a chroma vector store with similarity search to obtain relevant documents. k is set to 5 because this appeared to produce the best results, for relevance and accuracy of model responses.
 
 ### Conversational Interface
 The existing interface was kept largely unchanged. The interface includes a document uploader capable of supporting multiple document uploads. Documents can have the same name and they are assumed to contain new information.
+
+Additionally, sources are kept to make sure the model references what documents it is using to answer questions. This appears in whatever way the model deems appropriate, either inline or after its statement is complete.
 
 
 
