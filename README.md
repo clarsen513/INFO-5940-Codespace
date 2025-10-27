@@ -37,6 +37,7 @@ Codespaces is not free, but their per-month [free quota](https://docs.github.com
 * Unless you're on a free plan, or within your free quota, costs acrue while the codespace is running, whether or not you have it open in your browser or are working on it
 * You can control when it's running, and the space it takes up.  Check out [GitHub's codespaces lifecycle documentation](https://docs.github.com/en/codespaces/about-codespaces/understanding-the-codespace-lifecycle)
 
+<<<<<<< HEAD
 ## Sync Updates 
 To make sure your personal forked repository stays up to date with the original class repository, please follow these steps:
 1. Open your forked repo.
