@@ -1,7 +1,7 @@
 aioboto3==12
 fsspec
 openai~=1.14
-pandas==2
+pandas==2.3.3
 pydantic  # 2.12.0
 s3fs
 streamlit>=1.36
@@ -12,6 +12,7 @@ langchain-community==0.3.31
 langchain==0.3.27
 langchain_core==0.3.79
 langchain-openai==0.3.35
+chromadb
 
 cfn_flip
 cfn-lint

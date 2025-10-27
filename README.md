@@ -107,6 +107,8 @@ Next, the user should install the requirements listed under `requirements.txt` u
 pip install -r requirements.txt
 ```
 
+These requirements have only one change from the starter code. There was a version conflict for numpy caused by the pandas version. This was resolved by changing `pandas=2` to `pandas=2.3.3`. Additionally, sometimes the intial downloads in the setup (`pip install "chromadb>=0.5" langchain_chroma langgraph`) fail. In that case the app will complain that it does not have chromadb. This can be resolved by running that pip install again.
+
 ### Run command
 
 The user can start the application by running
