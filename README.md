@@ -90,3 +90,51 @@ You will receive an individual API Key for class assignments. To prevent acciden
 
 ## Troubleshooting
 - The Jupyter extension should install automatically. If you still cannot select a Python kernel on Jupyter Notebook: Go to the left sidebar >> **Extensions** >> search for **Jupyter** >> reload window (or reinstall it).   
+
+
+
+# Assignment 1 Implementation
+
+## Running the application
+
+### Setup
+The user must include their api key and base url in `.devcontainer/devcontainer.json`. They should update the `OPENAI_API_KEY` and `OPENAI_BASE_URL` fields with their key and base url respectively. 
+Note: The application uses OpenAI embeddings, so this must be supported by whatever base url is supplied.
+
+Next, the user should install the requirements listed under `requirements.txt` using 
+
+```bash
+pip install -r requirements.txt
+```
+
+### Run command
+
+The user can start the application by running
+```bash
+streamlit run chat_with_pdf.py
+```
+
+## Design Decisions
+### Ingestion and Chunking
+
+#### Initial Processing
+I made the decision to process documents only once, the first time they are required for a query. These means that initial queries are often slower due to the overhead of building a vector store and vectorizing the contents of the user document all at once. However, there is the benefit of only having to pay embedding costs the first time the document information is used. The vector store information is persistent across queries, so does not require recomputation.
+
+#### Multi-Document
+As stated before, documents are only handled once. Thus, we need to have a way to make sure new documents still get handled. So, we keep track of document ids that have been processed before. If a document id has not been processed, we vectorize it and extend our existing vector store to include that information.
+
+#### Document Deletion
+When a document is deleted, we do not remove its information from the vector store. If a user wants the model to forget this information, they must start a new chat. This decision was made because the document will have been used in previous parts of the chat, so it will already have context in the chat. Additionally, due to the nature of RAG, it is unnecessary to remove old document information because the user's new queries can be related specifically to the new document.
+
+#### Chunking
+I chose a chunk size of 200 and overlap of 0. In all the trials I ran with different documents, this appeared to get the best results for efficiency and correctness for model responses.
+
+### RAG pipeline
+I queried a chroma vector store with similarity search to obtain relevant documents. k is set to 5 because this appeared to produce the best results, for relevance and accuracy of model responses.
+
+### Conversational Interface
+The existing interface was kept largely unchanged. The interface includes a document uploader capable of supporting multiple document uploads. Documents can have the same name and they are assumed to contain new information.
+
+
+
+
