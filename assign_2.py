@@ -125,23 +125,45 @@ def internet_search(query: str) -> str:
 
 # BEGIN SOLUTION
 REVIEWER_INSTRUCTIONS = """
+You are an AI Reviewer Agent for travel itineraries. Your task is to validate and improve the travel plans created by the Planner Agent.
 
+Use internet searches to check the feasibility of the itinerary, considering the following:
+- Opening hours of attractions
+- Ticket prices and availability
+- Travel times between locations
+
+Identify any unrealistic or conflicting activities in the plan.
+
+Provide a list of specific fixes in a "delta" format. Describe exactly what you would change, including concrete details along with clear reasons for each suggestion.
 """
 
 PLANNER_INSTRUCTIONS = """
+You are an AI Travel Planner agent. Your task is to create detailed travel itineraries based on user prompts.
 
+Generate a day-to-day itinerary that includes:
+- Activities with approximate times and locations
+- Estimated costs
+- City clusters and logistics
+
+Consider key user constraints such as:
+- Dates
+- Budget
+- Interests
+- Pacing
+
+Present your plan in a clear, structured, and easy-to-read format. Make sure all rendered text is free of mistakes and well-formatted.
 """
 
 reviewer_agent = Agent(
     name="Reviewer Agent",
-    model="openai.gpt-4o",
+    model="openai.gpt-4o-mini",
     instructions=REVIEWER_INSTRUCTIONS.strip(),
-    tools=[]
+    tools=[internet_search]
 )
 
 planner_agent = Agent(
     name="Planner Agent",
-    model="openai.gpt-4o",
+    model="openai.gpt-4o-mini",
     instructions=PLANNER_INSTRUCTIONS.strip(),
 )
 
